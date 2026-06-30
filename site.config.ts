@@ -16,8 +16,8 @@ export const siteConfig = {
     text: "#1a1a2e",
     textMuted: "#4a5568",
     borderRadius: "0.5rem",
-    fontHeading: "system-ui, sans-serif",
-    fontBody: "system-ui, sans-serif",
+    fontHeading: "'Figtree', system-ui, sans-serif",
+    fontBody: "'Noto Sans', system-ui, sans-serif",
   },
 
   affiliate: {
