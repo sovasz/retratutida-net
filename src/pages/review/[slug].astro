@@ -1,0 +1,89 @@
+---
+import Base from "../../layouts/Base.astro";
+import CTABanner from "../../components/CTABanner.astro";
+import { siteConfig } from "../../../site.config";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const items = await getCollection("review", ({ data }) => !data.draft);
+  return items.map((item) => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+
+const stars = "★".repeat(Math.round(item.data.rating)) + "☆".repeat(5 - Math.round(item.data.rating));
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  name: item.data.title,
+  description: item.data.description,
+  reviewRating: {
+    "@type": "Rating",
+    ratingValue: item.data.rating,
+    bestRating: 5,
+    worstRating: 1,
+  },
+  author: { "@type": "Person", name: item.data.author },
+  itemReviewed: {
+    "@type": "Product",
+    name: `${item.data.brand} — ${item.data.product}`,
+    brand: { "@type": "Brand", name: item.data.brand },
+  },
+  datePublished: item.data.publishedAt.toISOString(),
+};
+---
+
+<Base
+  title={item.data.title}
+  description={item.data.description}
+  type="article"
+  publishedAt={item.data.publishedAt}
+  keywords={item.data.keywords}
+  jsonLd={jsonLd}
+  breadcrumbs={[{ label: "Reviews", href: "/review/" }, { label: item.data.title, href: `/review/${item.id}/` }]}
+>
+  <div class="container article-header">
+    <a href="/review/" class="article-tag">Review</a>
+    <h1 class="article-title">{item.data.title}</h1>
+    <div class="article-meta">
+      <span class="stars" aria-label={`${item.data.rating} de 5 estrelas`}>{stars}</span>
+      <span>{item.data.rating}/5</span>
+      <span>Por {item.data.author}</span>
+      <span>{item.data.publishedAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</span>
+    </div>
+  </div>
+
+  <div class="container content-wrap">
+    <div class="prose" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem">
+      <div>
+        <strong style="color:var(--color-primary)">Prós</strong>
+        <ul>
+          {item.data.pros.map((p) => <li>{p}</li>)}
+        </ul>
+      </div>
+      <div>
+        <strong style="color:var(--color-text-muted)">Contras</strong>
+        <ul>
+          {item.data.cons.map((c) => <li>{c}</li>)}
+        </ul>
+      </div>
+    </div>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <blockquote class="prose" style="margin:2rem 0">
+      <strong>Veredito:</strong> {item.data.verdict}
+    </blockquote>
+
+    <CTABanner
+      label={item.data.buyLink ? "Comprar no Pharmazil" : siteConfig.affiliate.ctaLabel}
+    />
+  </div>
+</Base>

@@ -1,0 +1,36 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const items = (await getCollection("review", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+---
+
+<Base
+  title="Reviews — Synedica, Pepking e outros peptídeos"
+  description="Reviews detalhadas de Retatrutida: Synedica, Pepking e outras marcas. Prós, contras, qualidade, preço e onde comprar."
+  breadcrumbs={[{ label: "Reviews", href: "/review/" }]}
+>
+  <section class="section">
+    <div class="container">
+      <div class="section__header">
+        <h1 class="section__title">Reviews</h1>
+        <p class="section__subtitle">Avaliações detalhadas por produto e marca.</p>
+      </div>
+      {items.length === 0 ? (
+        <p style="text-align:center;color:var(--color-text-muted)">Em breve.</p>
+      ) : (
+        <div class="card-grid">
+          {items.map((item) => (
+            <a href={`/review/${item.id}/`} class="card">
+              <span class="card__tag">Review · {item.data.brand}</span>
+              <h2 class="card__title">{item.data.title}</h2>
+              <p class="card__desc">{item.data.description}</p>
+              <span class="card__meta" style="color:#f6ad55">{"★".repeat(Math.round(item.data.rating))} {item.data.rating}/5</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</Base>

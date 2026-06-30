@@ -1,0 +1,35 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const items = (await getCollection("glossario", ({ data }) => !data.draft))
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, "pt-BR"));
+---
+
+<Base
+  title="Glossário — Retatrutida, Tirzepatida, GLP-1 e Peptídeos"
+  description="Definições claras sobre Retatrutida, Tirzepatida, GLP-1, agonistas e termos técnicos usados no mercado de peptídeos."
+  breadcrumbs={[{ label: "Glossário", href: "/glossario/" }]}
+>
+  <section class="section">
+    <div class="container">
+      <div class="section__header">
+        <h1 class="section__title">Glossário</h1>
+        <p class="section__subtitle">Entenda os termos antes de comprar.</p>
+      </div>
+      {items.length === 0 ? (
+        <p style="text-align:center;color:var(--color-text-muted)">Em breve.</p>
+      ) : (
+        <div class="card-grid">
+          {items.map((item) => (
+            <a href={`/glossario/${item.id}/`} class="card">
+              <span class="card__tag">Glossário</span>
+              <h2 class="card__title">{item.data.title}</h2>
+              <p class="card__desc">{item.data.description}</p>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</Base>

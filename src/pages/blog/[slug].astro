@@ -1,0 +1,68 @@
+---
+import Base from "../../layouts/Base.astro";
+import CTABanner from "../../components/CTABanner.astro";
+import FAQAccordion from "../../components/FAQAccordion.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.publishedAt.toISOString(),
+  dateModified: (post.data.updatedAt ?? post.data.publishedAt).toISOString(),
+  author: { "@type": "Person", name: post.data.author },
+};
+---
+
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  type="article"
+  publishedAt={post.data.publishedAt}
+  updatedAt={post.data.updatedAt}
+  keywords={post.data.keywords}
+  jsonLd={jsonLd}
+  breadcrumbs={[{ label: "Blog", href: "/blog/" }, { label: post.data.title, href: `/blog/${post.id}/` }]}
+>
+  <div class="container article-header">
+    <a href="/blog/" class="article-tag">Blog</a>
+    <h1 class="article-title">{post.data.title}</h1>
+    <div class="article-meta">
+      <span>Por {post.data.author}</span>
+      <span>
+        {post.data.publishedAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+      </span>
+    </div>
+  </div>
+
+  {post.data.cover && (
+    <div class="container">
+      <img
+        src={post.data.cover}
+        alt={post.data.coverAlt ?? post.data.title}
+        class="article-cover"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+  )}
+
+  <div class="container content-wrap">
+    <div class="prose">
+      <Content />
+    </div>
+    <CTABanner />
+  </div>
+</Base>

@@ -1,0 +1,67 @@
+---
+import Base from "../../layouts/Base.astro";
+import ComparisonTable from "../../components/ComparisonTable.astro";
+import CTABanner from "../../components/CTABanner.astro";
+import FAQAccordion from "../../components/FAQAccordion.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const items = await getCollection("comparar", ({ data }) => !data.draft);
+  return items.map((item) => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: item.data.title,
+  description: item.data.description,
+  datePublished: item.data.publishedAt.toISOString(),
+  dateModified: (item.data.updatedAt ?? item.data.publishedAt).toISOString(),
+  author: { "@type": "Person", name: item.data.author },
+};
+---
+
+<Base
+  title={item.data.title}
+  description={item.data.description}
+  type="article"
+  publishedAt={item.data.publishedAt}
+  keywords={item.data.keywords}
+  jsonLd={jsonLd}
+  breadcrumbs={[{ label: "Comparações", href: "/comparar/" }, { label: item.data.title, href: `/comparar/${item.id}/` }]}
+>
+  <div class="container article-header">
+    <a href="/comparar/" class="article-tag">Comparação</a>
+    <h1 class="article-title">{item.data.title}</h1>
+    <div class="article-meta">
+      <span>Por {item.data.author}</span>
+      <span>
+        {item.data.publishedAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+      </span>
+    </div>
+  </div>
+
+  <div class="container content-wrap">
+    {item.data.tableRows && (
+      <ComparisonTable products={item.data.products} rows={item.data.tableRows} />
+    )}
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {item.data.verdict && (
+      <blockquote class="prose" style="margin:2rem 0">
+        <strong>Veredito:</strong> {item.data.verdict}
+      </blockquote>
+    )}
+
+    <CTABanner />
+  </div>
+</Base>

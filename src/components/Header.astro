@@ -1,0 +1,52 @@
+---
+import { siteConfig } from "../../site.config";
+const { nav, name, affiliate } = siteConfig;
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo" aria-label="Ir para a página inicial">
+      <span class="logo-text">{name}</span>
+    </a>
+
+    <nav class="nav" aria-label="Navegação principal">
+      <ul class="nav-list">
+        {nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={["nav-link", { active: currentPath.startsWith(item.href) && item.href !== "/" || currentPath === item.href }]}
+              aria-current={currentPath === item.href ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <a
+      href={`${affiliate.url}?utm_source=${affiliate.utmSource}&utm_medium=${affiliate.utmMedium}&utm_campaign=${affiliate.utmCampaign}`}
+      class="btn btn-accent header-cta"
+      target="_blank"
+      rel="noopener sponsored"
+    >
+      {affiliate.ctaLabelShort}
+    </a>
+
+    <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector(".nav-toggle")!;
+  const nav = document.querySelector(".nav")!;
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", String(!expanded));
+    nav.classList.toggle("nav--open");
+  });
+</script>

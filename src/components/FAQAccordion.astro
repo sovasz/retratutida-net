@@ -1,0 +1,64 @@
+---
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  items: FAQ[];
+}
+
+const { items } = Astro.props;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: items.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.answer,
+    },
+  })),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd, null, 0)} />
+
+<section class="faq" aria-label="Perguntas frequentes">
+  <h2 class="faq__heading">Perguntas Frequentes</h2>
+  <dl class="faq__list">
+    {items.map((item, i) => (
+      <div class="faq__item">
+        <dt>
+          <button
+            class="faq__question"
+            aria-expanded="false"
+            aria-controls={`faq-answer-${i}`}
+            id={`faq-question-${i}`}
+          >
+            {item.question}
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+        </dt>
+        <dd class="faq__answer" id={`faq-answer-${i}`} role="region" aria-labelledby={`faq-question-${i}`} hidden>
+          <p>{item.answer}</p>
+        </dd>
+      </div>
+    ))}
+  </dl>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>(".faq__question").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const expanded = btn.getAttribute("aria-expanded") === "true";
+      const answerId = btn.getAttribute("aria-controls")!;
+      const answer = document.getElementById(answerId)!;
+      btn.setAttribute("aria-expanded", String(!expanded));
+      answer.hidden = expanded;
+      btn.querySelector(".faq__icon")!.textContent = expanded ? "+" : "−";
+    });
+  });
+</script>

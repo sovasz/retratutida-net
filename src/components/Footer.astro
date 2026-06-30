@@ -1,0 +1,19 @@
+---
+import { siteConfig } from "../../site.config";
+const { footer, name, domain } = siteConfig;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-disclaimer">{footer.disclaimer}</p>
+    <nav class="footer-nav" aria-label="Links do rodapé">
+      {footer.links.map((link) => (
+        <a href={link.href} class="footer-link">{link.label}</a>
+      ))}
+    </nav>
+    <p class="footer-copy">
+      &copy; {year} {name} &mdash; <a href={domain} class="footer-domain">{domain.replace("https://", "")}</a>
+    </p>
+  </div>
+</footer>

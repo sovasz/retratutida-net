@@ -1,0 +1,28 @@
+---
+import { siteConfig } from "../../site.config";
+
+interface Props {
+  title?: string;
+  body?: string;
+  label?: string;
+}
+
+const {
+  title = "Pronto para comprar com segurança?",
+  body = "Acesse o catálogo do Pharmazil — fonte confiável com procedência verificada.",
+  label = siteConfig.affiliate.ctaLabel,
+} = Astro.props;
+
+const { affiliate } = siteConfig;
+const href = `${affiliate.url}?utm_source=${affiliate.utmSource}&utm_medium=${affiliate.utmMedium}&utm_campaign=cta-banner`;
+---
+
+<aside class="cta-banner">
+  <div class="cta-banner__content">
+    <p class="cta-banner__title">{title}</p>
+    <p class="cta-banner__body">{body}</p>
+  </div>
+  <a href={href} class="btn btn-accent cta-banner__btn" target="_blank" rel="noopener sponsored">
+    {label}
+  </a>
+</aside>

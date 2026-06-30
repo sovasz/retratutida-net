@@ -1,0 +1,35 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const items = (await getCollection("comparar", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+---
+
+<Base
+  title="Comparações — Retatrutida vs Tirzepatida, Synedica vs Pepking e mais"
+  description="Tabelas comparativas detalhadas: Retatrutida vs Tirzepatida, Synedica vs Pepking, princípio ativo, preço e forma de aplicação."
+  breadcrumbs={[{ label: "Comparações", href: "/comparar/" }]}
+>
+  <section class="section">
+    <div class="container">
+      <div class="section__header">
+        <h1 class="section__title">Comparações</h1>
+        <p class="section__subtitle">Tabelas detalhadas pra você escolher o produto certo.</p>
+      </div>
+      {items.length === 0 ? (
+        <p style="text-align:center;color:var(--color-text-muted)">Em breve.</p>
+      ) : (
+        <div class="card-grid">
+          {items.map((item) => (
+            <a href={`/comparar/${item.id}/`} class="card">
+              <span class="card__tag">Comparação</span>
+              <h2 class="card__title">{item.data.title}</h2>
+              <p class="card__desc">{item.data.description}</p>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</Base>

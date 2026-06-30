@@ -1,0 +1,32 @@
+---
+import Base from "../layouts/Base.astro";
+import { siteConfig } from "../../site.config";
+---
+
+<Base
+  title="Sobre — Retatrutida.net"
+  description="Saiba quem somos e por que criamos este guia sobre Retatrutida."
+  breadcrumbs={[{ label: "Sobre", href: "/sobre/" }]}
+>
+  <div class="container content-wrap section">
+    <h1 class="article-title">Sobre o Retatrutida.net</h1>
+    <div class="prose">
+      <p>
+        Este site foi criado para ajudar quem pesquisa sobre Retatrutida a encontrar informação técnica
+        clara, sem jargão desnecessário e sem omitir o que realmente importa: diferenças entre marcas,
+        como identificar produto original e onde comprar com segurança.
+      </p>
+      <p>
+        Somos afiliados ao <a href={siteConfig.affiliate.url} target="_blank" rel="noopener sponsored">Pharmazil</a>,
+        uma das fontes de peptídeos com maior especialização no mercado brasileiro.
+        Isso significa que recebemos comissão quando você compra pelo nosso link — mas não significa que
+        recomendamos qualquer coisa sem critério. Todo conteúdo aqui é baseado em informação técnica pública
+        e comparativa real.
+      </p>
+      <p>
+        As informações neste site têm fins informativos e não substituem orientação médica.
+        Consulte um profissional de saúde antes de iniciar qualquer tratamento com peptídeos.
+      </p>
+    </div>
+  </div>
+</Base>

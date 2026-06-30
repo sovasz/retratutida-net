@@ -1,0 +1,149 @@
+---
+import Base from "../layouts/Base.astro";
+import CTABanner from "../components/CTABanner.astro";
+import FAQAccordion from "../components/FAQAccordion.astro";
+import { siteConfig } from "../../site.config";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime())
+  .slice(0, 3);
+
+const comparisons = (await getCollection("comparar", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime())
+  .slice(0, 3);
+
+const glossary = (await getCollection("glossario", ({ data }) => !data.draft))
+  .slice(0, 4);
+
+const faqItems = [
+  {
+    question: "O que é Retatrutida?",
+    answer:
+      "Retatrutida (também chamada de Retatrutide) é um peptídeo sintético agonista triplo dos receptores GLP-1, GIP e glucagon. Age em três vias simultâneas, resultando em maior perda de peso comparada a análogos GLP-1 simples como semaglutida.",
+  },
+  {
+    question: "Qual a diferença entre Retatrutida e Tirzepatida (TG/Mounjaro)?",
+    answer:
+      "Tirzepatida (princípio ativo da TG e do Mounjaro) é um agonista dual (GLP-1 + GIP). Retatrutida é um agonista triplo (GLP-1 + GIP + glucagon), com potência de emagrecimento potencialmente maior em estudos clínicos. São moléculas diferentes, não intercambiáveis.",
+  },
+  {
+    question: "Synedica e Pepking são a mesma coisa?",
+    answer:
+      "São marcas distintas que comercializam Retatrutida. A diferença está na pureza declarada, apresentação (frasco/seringa) e preço por dose. Ambas são peptídeos de uso off-label — não há aprovação regulatória brasileira para Retatrutida até a data desta publicação.",
+  },
+  {
+    question: "Onde comprar Retatrutida com procedência confiável?",
+    answer:
+      "O Pharmazil é uma das fontes especializadas no mercado brasileiro. Trabalha com os peptídeos Synedica e Pepking com laudos de análise. Acesse o link de compra neste site para ser direcionado ao catálogo.",
+  },
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: siteConfig.seo.defaultTitle,
+  description: siteConfig.seo.defaultDescription,
+  url: siteConfig.domain,
+};
+---
+
+<Base jsonLd={jsonLd}>
+  <section class="hero">
+    <div class="container">
+      <p class="hero__eyebrow">Guia completo</p>
+      <h1 class="hero__title">Tudo sobre Retatrutida<br />sem enrolação</h1>
+      <p class="hero__lead">
+        Comparações entre marcas, guias de uso e onde comprar com procedência verificada.
+        Informação técnica, direta ao ponto.
+      </p>
+      <div class="hero__actions">
+        <a
+          href={`${siteConfig.affiliate.url}?utm_source=${siteConfig.affiliate.utmSource}&utm_medium=${siteConfig.affiliate.utmMedium}&utm_campaign=hero`}
+          class="btn btn-accent"
+          target="_blank"
+          rel="noopener sponsored"
+        >
+          {siteConfig.affiliate.ctaLabel}
+        </a>
+        <a href="/comparar/" class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);color:#fff;">
+          Ver comparações
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {comparisons.length > 0 && (
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section__header">
+          <h2 class="section__title">Comparações</h2>
+          <p class="section__subtitle">Entenda as diferenças entre produtos antes de decidir.</p>
+        </div>
+        <div class="card-grid">
+          {comparisons.map((item) => (
+            <a href={`/comparar/${item.id}/`} class="card">
+              <span class="card__tag">Comparação</span>
+              <h3 class="card__title">{item.data.title}</h3>
+              <p class="card__desc">{item.data.description}</p>
+            </a>
+          ))}
+        </div>
+        <div style="text-align:center;margin-top:2rem">
+          <a href="/comparar/" class="btn btn-outline">Ver todas as comparações</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {glossary.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section__header">
+          <h2 class="section__title">Glossário</h2>
+          <p class="section__subtitle">Entenda os termos antes de comprar.</p>
+        </div>
+        <div class="card-grid">
+          {glossary.map((item) => (
+            <a href={`/glossario/${item.id}/`} class="card">
+              <span class="card__tag">Glossário</span>
+              <h3 class="card__title">{item.data.title}</h3>
+              <p class="card__desc">{item.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <div class="container">
+    <CTABanner />
+  </div>
+
+  {posts.length > 0 && (
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section__header">
+          <h2 class="section__title">Blog</h2>
+          <p class="section__subtitle">Artigos aprofundados sobre peptídeos e emagrecimento.</p>
+        </div>
+        <div class="card-grid">
+          {posts.map((post) => (
+            <a href={`/blog/${post.id}/`} class="card">
+              <span class="card__tag">Blog</span>
+              <h3 class="card__title">{post.data.title}</h3>
+              <p class="card__desc">{post.data.description}</p>
+              <span class="card__meta">
+                {post.data.publishedAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <div class="container">
+    <FAQAccordion items={faqItems} />
+  </div>
+</Base>

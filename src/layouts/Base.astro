@@ -1,0 +1,91 @@
+---
+import SEO from "../components/SEO.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { siteConfig } from "../../site.config";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  type?: "website" | "article";
+  publishedAt?: Date;
+  updatedAt?: Date;
+  keywords?: string[];
+  jsonLd?: object | object[];
+  noindex?: boolean;
+  breadcrumbs?: { label: string; href: string }[];
+}
+
+const {
+  breadcrumbs,
+  ...seoProps
+} = Astro.props;
+
+const { brand } = siteConfig;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <SEO {...seoProps} />
+    <style define:vars={{
+      "color-primary": brand.primary,
+      "color-accent": brand.accent,
+      "color-accent-hover": brand.accentHover,
+      "color-bg": brand.bg,
+      "color-surface": brand.surface,
+      "color-text": brand.text,
+      "color-text-muted": brand.textMuted,
+      "radius": brand.borderRadius,
+      "font-heading": brand.fontHeading,
+      "font-body": brand.fontBody,
+    }}>
+      :root {
+        --color-primary: var(--color-primary);
+        --color-accent: var(--color-accent);
+        --color-accent-hover: var(--color-accent-hover);
+        --color-bg: var(--color-bg);
+        --color-surface: var(--color-surface);
+        --color-text: var(--color-text);
+        --color-text-muted: var(--color-text-muted);
+        --radius: var(--radius);
+        --font-heading: var(--font-heading);
+        --font-body: var(--font-body);
+      }
+    </style>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+    <Header />
+
+    {breadcrumbs && breadcrumbs.length > 0 && (
+      <nav class="breadcrumb" aria-label="Caminho de navegação">
+        <div class="container">
+          <ol class="breadcrumb__list">
+            <li><a href="/">Início</a></li>
+            {breadcrumbs.map((crumb, i) => (
+              <li aria-current={i === breadcrumbs.length - 1 ? "page" : undefined}>
+                {i < breadcrumbs.length - 1
+                  ? <a href={crumb.href}>{crumb.label}</a>
+                  : <span>{crumb.label}</span>
+                }
+              </li>
+            ))}
+          </ol>
+        </div>
+      </nav>
+    )}
+
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

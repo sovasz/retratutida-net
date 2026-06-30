@@ -1,0 +1,59 @@
+---
+import Base from "../../layouts/Base.astro";
+import CTABanner from "../../components/CTABanner.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const items = await getCollection("glossario", ({ data }) => !data.draft);
+  return items.map((item) => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "DefinedTerm",
+  name: item.data.title,
+  description: item.data.description,
+  inDefinedTermSet: {
+    "@type": "DefinedTermSet",
+    name: "Glossário de Peptídeos — Retatrutida.net",
+  },
+};
+---
+
+<Base
+  title={item.data.title}
+  description={item.data.description}
+  type="article"
+  publishedAt={item.data.publishedAt}
+  keywords={item.data.keywords}
+  jsonLd={jsonLd}
+  breadcrumbs={[{ label: "Glossário", href: "/glossario/" }, { label: item.data.title, href: `/glossario/${item.id}/` }]}
+>
+  <div class="container article-header">
+    <a href="/glossario/" class="article-tag">Glossário</a>
+    <h1 class="article-title">{item.data.title}</h1>
+    <div class="article-meta">
+      <span>Atualizado em {item.data.publishedAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</span>
+    </div>
+  </div>
+
+  <div class="container content-wrap">
+    <div class="prose">
+      <Content />
+    </div>
+
+    {item.data.products.length > 0 && (
+      <div style="margin-top:2rem">
+        <p><strong>Produtos relacionados no Pharmazil:</strong> {item.data.products.join(", ")}</p>
+      </div>
+    )}
+
+    <CTABanner title={`Quer comprar ${item.data.title} com procedência?`} />
+  </div>
+</Base>
